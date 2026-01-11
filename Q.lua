@@ -10,14 +10,14 @@ ScreenGui.Name = "redz Hub"
 ScreenGui.Parent = game.CoreGui
 ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
--- Main Frame (30% man hinh)
+-- Main Frame (50% man hinh)
 MainFrame.Name = "MainFrame"
 MainFrame.Parent = ScreenGui
 MainFrame.AnchorPoint = Vector2.new(0, 0.5)
 MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
 MainFrame.BorderSizePixel = 0
 MainFrame.Position = UDim2.new(0, 10, 0.5, 0)
-MainFrame.Size = UDim2.new(0.3, 0, 0.7, 0) -- 30% width, 70% height
+MainFrame.Size = UDim2.new(0.5, 0, 0.8, 0) -- 50% width, 80% height
 MainFrame.Active = true
 MainFrame.Draggable = true
 
@@ -229,6 +229,7 @@ local function loadFarmingTab()
     -- Fly Toggle
     local flyEnabled = false
     local flySpeed = 50
+    local flyConnection
     
     createToggle(Container, "Fly", 50, function(enabled)
         flyEnabled = enabled
@@ -239,33 +240,45 @@ local function loadFarmingTab()
         if enabled then
             print("[FLY] Enabled")
             
+            if flyConnection then
+                flyConnection:Disconnect()
+            end
+            
             -- Fly loop
-            game:GetService("RunService").Heartbeat:Connect(function()
-                if not flyEnabled then return end
+            flyConnection = game:GetService("RunService").Heartbeat:Connect(function()
+                if not flyEnabled then 
+                    if flyConnection then
+                        flyConnection:Disconnect()
+                    end
+                    return 
+                end
+                
+                char = player.Character
                 if not char or not char:FindFirstChild("HumanoidRootPart") then return end
                 
                 local hrp = char.HumanoidRootPart
                 local humanoid = char:FindFirstChild("Humanoid")
                 
                 local moveDirection = Vector3.new()
+                local UIS = game:GetService("UserInputService")
                 
                 -- WASD controls
-                if game:GetService("UserInputService"):IsKeyDown(Enum.KeyCode.W) then
+                if UIS:IsKeyDown(Enum.KeyCode.W) then
                     moveDirection = moveDirection + workspace.CurrentCamera.CFrame.LookVector
                 end
-                if game:GetService("UserInputService"):IsKeyDown(Enum.KeyCode.S) then
+                if UIS:IsKeyDown(Enum.KeyCode.S) then
                     moveDirection = moveDirection - workspace.CurrentCamera.CFrame.LookVector
                 end
-                if game:GetService("UserInputService"):IsKeyDown(Enum.KeyCode.A) then
+                if UIS:IsKeyDown(Enum.KeyCode.A) then
                     moveDirection = moveDirection - workspace.CurrentCamera.CFrame.RightVector
                 end
-                if game:GetService("UserInputService"):IsKeyDown(Enum.KeyCode.D) then
+                if UIS:IsKeyDown(Enum.KeyCode.D) then
                     moveDirection = moveDirection + workspace.CurrentCamera.CFrame.RightVector
                 end
-                if game:GetService("UserInputService"):IsKeyDown(Enum.KeyCode.Space) then
+                if UIS:IsKeyDown(Enum.KeyCode.Space) then
                     moveDirection = moveDirection + Vector3.new(0, 1, 0)
                 end
-                if game:GetService("UserInputService"):IsKeyDown(Enum.KeyCode.LeftShift) then
+                if UIS:IsKeyDown(Enum.KeyCode.LeftShift) then
                     moveDirection = moveDirection - Vector3.new(0, 1, 0)
                 end
                 
@@ -275,6 +288,10 @@ local function loadFarmingTab()
             end)
         else
             print("[FLY] Disabled")
+            
+            if flyConnection then
+                flyConnection:Disconnect()
+            end
             
             if char and char:FindFirstChild("Humanoid") then
                 char.Humanoid.PlatformStand = false
@@ -353,4 +370,4 @@ createTabButton("Tab Sea Event", "rbxassetid://0", 410, function()
     print("Sea Event tab")
 end)
 
-print("[redz Hub] Loaded!")
+print("[redz Hub] Loaded - 50% screen!")
